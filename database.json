@@ -1,0 +1,40 @@
+{
+  "users": [
+    {
+      "id": "USR_BAWA1F34R",
+      "fullName": "John doe",
+      "email": "jindu@gmal.com",
+      "password": "$2b$10$x7BMOdf8JEF6SnNq9asu7uAoqkyFrJhwe9UQdd9fG7k9Dty94w7Ze",
+      "walletAddress": "Hdhdhdhd",
+      "balance": 0,
+      "earnings": 0,
+      "createdAt": "2026-05-18T16:52:22.910Z"
+    },
+    {
+      "id": "USR_JEXBPW5HW",
+      "fullName": "John doe",
+      "email": "jagab@gmail.com",
+      "password": "$2b$10$fj/tRibdCfYnYpo5pKNMGegldYf/Sdyn7L2UdMgsL5.yNQ2HnM/1q",
+      "walletAddress": "Hshshdhdbd",
+      "balance": 0,
+      "earnings": 0,
+      "createdAt": "2026-05-18T17:21:17.663Z"
+    },
+    {
+      "id": "USR_0WYCKPDRM",
+      "fullName": "john",
+      "email": "hshd@gmail.com",
+      "password": "$2b$10$PpcFTxALKTGeDpBorawrjuMahFaLR0G9x6/nwCDxz4KaG2AqgtOm.",
+      "walletAddress": "hdhdhdh",
+      "balance": 0,
+      "earnings": 0,
+      "createdAt": "2026-05-18T17:52:07.811Z"
+    }
+  ],
+  "deposits": [],
+  "withdrawals": [],
+  "settings": {
+    "adminPasskey": "Admin2026!",
+    "globalWalletAddress": "bc1q7zuadd7wr7lmk37z04jxng8m38pfdglsr8nqhy"
+  }
+}

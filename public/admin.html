@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hillstrade Engine | Command Node</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0b0f19; color: #f3f4f6; font-family: system-ui, sans-serif; }
+        .glow-admin { box-shadow: 0 0 30px rgba(168, 85, 247, 0.15); }
+    </style>
+</head>
+<body class="antialiased pb-24">
+
+    <nav class="border-b border-purple-900/40 bg-[#0f172a]/95 px-6 py-4 flex justify-between items-center fixed top-0 w-full z-50">
+        <div class="text-sm font-mono font-black tracking-widest text-purple-400 flex items-center gap-2">
+            <i class="fa-solid fa-terminal animate-pulse"></i> HILLSTRADE CENTRAL COMMAND TERMINAL
+        </div>
+        <button onclick="adminLogout()" id="logoutBtn" class="hidden text-xs bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1 rounded-lg font-bold hover:bg-red-500 hover:text-white transition">
+            Disconnect Terminal
+        </button>
+    </nav>
+
+    <div id="adminGate" class="min-h-screen flex items-center justify-center p-4 pt-20">
+        <div class="bg-[#111827] border border-purple-500/30 rounded-2xl p-6 w-full max-w-sm glow-admin space-y-4">
+            <div class="text-center">
+                <div class="bg-purple-500/10 text-purple-400 w-12 h-12 rounded-full flex items-center justify-center mx-auto text-xl mb-2">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">Infrastructure Authorization</h3>
+                <p class="text-xs text-gray-400">Provide root administrative terminal access passkey</p>
+            </div>
+            <div class="space-y-3">
+                <input type="password" id="adminPasskey" placeholder="Enter Root Passkey" class="w-full bg-[#0b0f19] border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500 font-mono text-center">
+                <button onclick="loginAdmin()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs transition tracking-wider">
+                    UNLOCK NODE INTERFACE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <main id="adminWorkspace" class="hidden max-w-6xl mx-auto px-4 pt-24 space-y-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-[#111827] border border-purple-900/30 p-5 rounded-2xl space-y-3 md:col-span-1">
+                <h3 class="text-xs font-bold text-purple-300 font-mono uppercase tracking-wider"><i class="fa-solid fa-wallet"></i> Destination Vault Wallet</h3>
+                <p class="text-[11px] text-gray-400">Updates the company payment collection address displayed to users instantly.</p>
+                <input type="text" id="walletTargetInput" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg p-2 text-xs font-mono text-emerald-400 focus:outline-none focus:border-purple-500">
+                <button onclick="modifyGlobalWallet()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 rounded-lg text-xs transition">Apply Global Core Shift</button>
+            </div>
+
+            <div class="bg-[#111827] border border-gray-800 p-5 rounded-2xl flex flex-col justify-center md:col-span-2">
+                <div class="grid grid-cols-2 gap-4 text-center font-mono">
+                    <div class="border-r border-gray-800">
+                        <span class="text-[10px] text-gray-400 block">TOTAL MONITORED USERS</span>
+                        <span id="statUsers" class="text-2xl font-black text-white">0</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-gray-400 block">PENDING SLIP QUEUE</span>
+                        <span id="statPending" class="text-2xl font-black text-amber-400">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-[#111827] border border-gray-800 rounded-2xl p-5 space-y-3">
+                <h3 class="text-sm font-black text-white uppercase"><i class="fa-solid fa-users text-purple-400"></i> Active User Registrations Ledger</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs font-mono">
+                        <thead>
+                            <tr class="bg-[#0b0f19] text-gray-400 text-[10px] uppercase border-b border-gray-800">
+                                <th class="p-3">User ID / Email</th>
+                                <th class="p-3">Full Legal Name</th>
+                                <th class="p-3">Wallet Destination Address</th>
+                                <th class="p-3 text-right">Ledger Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody" class="divide-y divide-gray-800/40 text-gray-300">
+                            <tr><td colspan="4" class="p-4 text-center text-gray-600">No database connections active</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-[#111827] border border-gray-800 rounded-2xl p-5 space-y-3">
+                <h3 class="text-sm font-black text-white uppercase"><i class="fa-solid fa-receipt text-amber-400"></i> Processing Funding Requests Slips</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs font-mono">
+                        <thead>
+                            <tr class="bg-[#0b0f19] text-gray-400 text-[10px] uppercase border-b border-gray-800">
+                                <th class="p-3">Slip Reference</th>
+                                <th class="p-3">User Link Account</th>
+                                <th class="p-3">Claimed Value</th>
+                                <th class="p-3">Notes / Proof Hash</th>
+                                <th class="p-3 text-right">Terminal Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="slipsTableBody" class="divide-y divide-gray-800/40 text-gray-300">
+                            <tr><td colspan="5" class="p-4 text-center text-gray-600">No deposit slips waiting processing</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let adminToken = localStorage.getItem('hillstrade_admin_token');
+
+        function checkSession() {
+            if (adminToken) {
+                document.getElementById('adminGate').classList.add('hidden');
+                document.getElementById('adminWorkspace').classList.remove('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
+                syncAdminDashboard();
+            }
+        }
+
+        async function loginAdmin() {
+            const passkey = document.getElementById('adminPasskey').value;
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ passkey })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    localStorage.setItem('hillstrade_admin_token', data.token);
+                    adminToken = data.token;
+                    checkSession();
+                } else { alert(data.msg); }
+            } catch (e) { alert('Terminal gateway handshake timed out.'); }
+        }
+
+        async function syncAdminDashboard() {
+            try {
+                const res = await fetch('/api/admin/data', {
+                    headers: { 'Authorization': adminToken }
+                });
+                if (!res.ok) { adminLogout(); return; }
+                const data = await res.json();
+
+                // Setup Stats & Settings Configuration details
+                document.getElementById('walletTargetInput').value = data.settings.globalWalletAddress;
+                document.getElementById('statUsers').innerText = data.users.length;
+                
+                const pendingSlips = data.deposits.filter(d => d.status === 'PENDING');
+                document.getElementById('statPending').innerText = pendingSlips.length;
+
+                // Sync Monitored User Records
+                const userBox = document.getElementById('usersTableBody');
+                if(data.users.length === 0) {
+                    userBox.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-600">No records inside table data clusters</td></tr>';
+                } else {
+                    userBox.innerHTML = data.users.map(u => `
+                        <tr class="hover:bg-purple-950/10">
+                            <td class="p-3"><span class="text-purple-400 font-bold">${u.id}</span><br><span class="text-gray-500 text-[11px]">${u.email}</span></td>
+                            <td class="p-3 text-white font-bold">${u.fullName}</td>
+                            <td class="p-3 text-gray-400 text-[11px] max-w-[150px] truncate">${u.walletAddress || 'Unlinked'}</td>
+                            <td class="p-3 text-right text-emerald-400 font-bold">$${u.balance.toLocaleString()}</td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Sync Claim Funding slips
+                const slipBox = document.getElementById('slipsTableBody');
+                if(data.deposits.length === 0) {
+                    slipBox.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-600">No funding tickets currently registered</td></tr>';
+                } else {
+                    slipBox.innerHTML = data.deposits.map(d => `
+                        <tr class="hover:bg-purple-950/10">
+                            <td class="p-3 text-amber-400 font-bold">${d.id}<br><span class="text-[9px] text-gray-500">${new Date(d.date).toLocaleDateString()}</span></td>
+                            <td class="p-3 text-gray-300 text-[11px]">${d.userEmail}</td>
+                            <td class="p-3 text-white font-black">$${d.amount.toLocaleString()}</td>
+                            <td class="p-3 text-gray-500 text-[11px] max-w-[120px] truncate">${d.txHash}</td>
+                            <td class="p-3 text-right">
+                                ${d.status === 'PENDING' ? 
+                                    `<button onclick="verifyUserFunds('${d.id}')" class="bg-emerald-500 text-slate-900 font-black px-3 py-1 rounded text-[10px] hover:bg-emerald-400 transition">APPROVE AND PAY</button>` : 
+                                    `<span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-500/20">CREDITED</span>`
+                                }
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+            } catch (err) { alert('Terminal dropped pipeline packets sync protocols.'); }
+        }
+
+        async function verifyUserFunds(depositId) {
+            if(!confirm('Validate payment record details and credit client balance ledger?')) return;
+            try {
+                const res = await fetch('/api/admin/approve-deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': adminToken },
+                    body: JSON.stringify({ depositId })
+                });
+                const data = await res.json();
+                if(res.ok) { alert(data.msg); syncAdminDashboard(); } else { alert(data.msg); }
+            } catch(e) { alert('Authorization action pipe execution failed.'); }
+        }
+
+        async function modifyGlobalWallet() {
+            const newAddress = document.getElementById('walletTargetInput').value;
+            if(!newAddress) return alert('Input target path destination');
+            try {
+                const res = await fetch('/api/admin/update-wallet', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': adminToken },
+                    body: JSON.stringify({ newAddress })
+                });
+                const data = await res.json();
+                if(res.ok) { alert(data.msg); syncAdminDashboard(); } else { alert(data.msg); }
+            } catch(e) { alert('Core settings adjustment frame transmission error.'); }
+        }
+
+        function adminLogout() {
+            localStorage.removeItem('hillstrade_admin_token');
+            window.location.reload();
+        }
+
+        checkSession();
+    </script>
+</body>
+</html>

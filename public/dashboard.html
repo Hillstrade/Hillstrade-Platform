@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hillstrade | Member Node Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0b0f19; color: #f3f4f6; font-family: system-ui, sans-serif; }
+        .glow-card { box-shadow: 0 0 25px rgba(16, 185, 129, 0.05); }
+    </style>
+</head>
+<body class="antialiased pb-12">
+
+    <nav class="border-b border-gray-800 bg-[#0f172a]/90 backdrop-blur-md px-6 py-4 flex justify-between items-center fixed top-0 w-full z-50">
+        <div class="text-lg font-bold tracking-wider text-emerald-400 flex items-center gap-2">
+            <i class="fa-brands fa-bitcoin text-xl"></i>MEMBER DASHBOARD.
+        </div>
+        <button onclick="logout()" class="text-xs bg-slate-800 hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20 px-3 py-1.5 rounded-lg font-bold transition">
+            Sign Out
+        </button>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 pt-24 space-y-8">
+        
+        <div class="bg-[#111827] border border-gray-800 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-xl font-black text-white">Welcome Back, <span id="userName" class="text-emerald-400">Loading Node Account...</span></h1>
+                <p class="text-xs text-gray-400 mt-0.5">Asset security: Multi-Sig Cold Vault Enabled</p>
+            </div>
+            <div class="text-xs bg-[#0b0f19] border border-gray-800 px-3 py-2 rounded-xl">
+                <span class="text-gray-500 font-mono">Settlement Destination:</span>
+                <span id="userWallet" class="font-mono font-bold text-white block truncate max-w-[200px]">None Linked</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-[#111827] border border-gray-800 p-6 rounded-2xl glow-card relative overflow-hidden">
+                <span class="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Active Working Balance</span>
+                <div class="text-3xl font-black text-white mt-1 font-mono" id="userBalance">0.0000 USD</div>
+                <div class="text-[11px] text-emerald-400 mt-2 font-mono"><i class="fa-solid fa-shield-halved"></i> Principal Capital Secured</div>
+            </div>
+            <div class="bg-[#111827] border border-gray-800 p-6 rounded-2xl glow-card relative overflow-hidden">
+                <span class="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Accumulated Growth Yield</span>
+                <div class="text-3xl font-black text-teal-400 mt-1 font-mono" id="userEarnings">0.0000 USD</div>
+                <div class="text-[11px] text-gray-400 mt-2 font-mono"><i class="fa-solid fa-arrow-trend-up"></i> Compounding Clock Active</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-[#111827] border border-gray-800 p-5 rounded-2xl space-y-4">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-wallet text-emerald-400"></i> Deploy Asset Node
+                </h3>
+                <p class="text-xs text-gray-400 leading-relaxed">
+                    To add capital to your tracking ledger profile, send your choice Bitcoin allocation directly to the network address below, then log your verification slip details.
+                </p>
+                <div class="bg-[#0b0f19] border border-gray-800 p-3 rounded-xl space-y-2">
+                    <span class="text-[10px] uppercase font-mono text-gray-500">Official Gateway Address:</span>
+                    <code id="globalWallet" class="text-xs text-emerald-300 font-mono break-all block select-all bg-slate-950 p-2 rounded">bc1q7zuadd7wr7lmk37z04jxng8m38pfdglsr8nqhy</code>
+                </div>
+                <div class="space-y-3 pt-2">
+                    <input type="number" id="depAmount" placeholder="Amount Sent (In USD value, e.g. 500)" class="w-full bg-[#0b0f19] border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+                    <input type="text" id="depTx" placeholder="Optional Transaction Note / Proof Link" class="w-full bg-[#0b0f19] border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+                    <button onclick="submitDepositSlip()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-black py-2.5 rounded-xl text-xs transition">
+                        LOG DEPOSIT SLIP PROTOCOL
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-[#111827] border border-gray-800 p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-3">
+                        <i class="fa-solid fa-clock-rotate-left text-gray-400"></i> Operation Logs
+                    </h3>
+                    <div id="statementLogs" class="space-y-2 max-h-[220px] overflow-y-auto pr-1 text-xs font-mono text-gray-400">
+                        <div class="text-center text-gray-600 py-6">No historical operations found</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const token = localStorage.getItem('hillstrade_user_token');
+        if (!token) window.location.href = '/auth.html';
+
+        async function loadDashboard() {
+            try {
+                const res = await fetch('/api/user/dashboard', {
+                    headers: { 'Authorization': token }
+                });
+                if (!res.ok) { logout(); return; }
+                
+                const data = await res.json();
+                document.getElementById('userName').innerText = data.fullName;
+                document.getElementById('userWallet').innerText = data.walletAddress || 'None Registered';
+                document.getElementById('userBalance').innerText = `$${data.balance.toLocaleString()}`;
+                document.getElementById('userEarnings').innerText = `$${data.earnings.toLocaleString()}`;
+                document.getElementById('globalWallet').innerText = data.globalWallet;
+
+                const logsBox = document.getElementById('statementLogs');
+                if(data.deposits.length === 0) {
+                    logsBox.innerHTML = '<div class="text-center text-gray-600 py-6">No historical entries found</div>';
+                    return;
+                }
+
+                logsBox.innerHTML = data.deposits.map(d => `
+                    <div class="bg-[#0b0f19] border border-gray-800/60 p-2.5 rounded-xl flex justify-between items-center">
+                        <div>
+                            <span class="text-[10px] ${d.status === 'CONFIRMED' ? 'text-emerald-400' : 'text-amber-400'} font-bold">${d.id}</span>
+                            <span class="block text-white font-bold">$${d.amount}</span>
+                        </div>
+                        <span class="text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider ${d.status === 'CONFIRMED' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">${d.status}</span>
+                    </div>
+                `).join('');
+
+            } catch (err) { alert('Failed to sync network data data blocks.'); }
+        }
+
+        async function submitDepositSlip() {
+            const amount = document.getElementById('depAmount').value;
+            const txHash = document.getElementById('depTx').value;
+            if(!amount || amount <= 0) return alert('Provide a valid deposit value asset amount');
+
+            try {
+                const res = await fetch('/api/user/deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                    body: JSON.stringify({ amount, txHash })
+                });
+                const data = await res.json();
+                if(res.ok) {
+                    alert('Deposit ticket logged. Awaiting manual administrative validation.');
+                    document.getElementById('depAmount').value = '';
+                    document.getElementById('depTx').value = '';
+                    loadDashboard();
+                } else { alert(data.msg); }
+            } catch(e) { alert('Communication with node dropped.'); }
+        }
+
+        function logout() {
+            localStorage.removeItem('hillstrade_user_token');
+            window.location.href = '/auth.html';
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

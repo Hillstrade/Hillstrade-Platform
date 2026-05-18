@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hillstrade | Secure Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0b0f19; color: #f3f4f6; font-family: system-ui, sans-serif; }
+        .glow-card { box-shadow: 0 0 25px rgba(16, 185, 129, 0.08); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased">
+
+    <nav class="border-b border-gray-800 bg-[#0f172a]/90 backdrop-blur-md px-6 py-4 flex justify-between items-center">
+        <a href="/" class="text-xl font-bold tracking-wider text-emerald-400 flex items-center gap-2">
+            <i class="fa-brands fa-bitcoin text-2xl"></i>HILLSTRADE.
+        </a>
+        <a href="/" class="text-xs text-gray-400 hover:text-emerald-400 font-medium transition">
+            <i class="fa-solid fa-arrow-left"></i> Home Page
+        </a>
+    </nav>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-[#111827] border border-gray-800 rounded-2xl p-6 glow-card space-y-6">
+            
+            <div class="text-center">
+                <h2 id="formTitle" class="text-2xl font-black text-white">Access Your Wealth Portfolio</h2>
+                <p id="formSubtitle" class="text-xs text-gray-400 mt-1">Provide credentials to enter the manual custody terminal</p>
+            </div>
+
+            <div id="alertBox" class="hidden text-xs font-semibold p-3.5 rounded-xl border bg-red-500/10 text-red-400 border-red-500/20 text-center"></div>
+
+            <form id="authForm" class="space-y-4">
+                <div id="signupFields" class="hidden space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Full Legal Name</label>
+                        <input type="text" id="regName" placeholder="e.g. John Doe" class="w-full bg-[#0b0f19] border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 font-medium">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Receiving Bitcoin Settlement Wallet Address</label>
+                        <input type="text" id="regWallet" placeholder="Your Personal Receiving bc1q..." class="w-full bg-[#0b0f19] border border-gray-800 rounded-xl px-4 py-2.5 text-xs text-emerald-300 font-mono focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Corporate Email Node</label>
+                    <input type="email" id="authEmail" placeholder="name@domain.com" class="w-full bg-[#0b0f19] border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 font-medium">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Account Password Key</label>
+                    <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-[#0b0f19] border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 font-mono">
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-500/10 mt-6 tracking-wide">
+                    AUTHENTICATE SESSION
+                </button>
+            </form>
+
+            <div class="text-center pt-2 border-t border-gray-800/60">
+                <p id="toggleText" class="text-xs text-gray-400">
+                    New to infrastructure nodes? 
+                    <button onclick="switchView(true)" class="text-emerald-400 hover:underline font-bold ml-1">Create Real Account</button>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="p-4 text-center text-[10px] text-gray-600 font-mono">
+        Hillstrade Encrypted Authentication Gate Node. Authorized Client Tracking Infrastructure Only.
+    </footer>
+
+    <script>
+        let isSignup = false;
+        const form = document.getElementById('authForm');
+        const alertBox = document.getElementById('alertBox');
+
+        function switchView(toSignup) {
+            isSignup = toSignup;
+            document.getElementById('signupFields').style.display = toSignup ? 'block' : 'none';
+            document.getElementById('formTitle').innerText = toSignup ? 'Register Secure Profile' : 'Access Your Wealth Portfolio';
+            document.getElementById('formSubtitle').innerText = toSignup ? 'Setup verified individual ledger coordinates' : 'Provide credentials to enter the manual custody terminal';
+            document.getElementById('toggleText').innerHTML = toSignup ? 
+                'Already hold active nodes? <button onclick="switchView(false)" class="text-emerald-400 hover:underline font-bold ml-1">Sign In Securely</button>' :
+                'New to infrastructure nodes? <button onclick="switchView(true)" class="text-emerald-400 hover:underline font-bold ml-1">Create Real Account</button>';
+            alertBox.classList.add('hidden');
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            alertBox.classList.add('hidden');
+
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            
+            const payload = { email, password };
+            let endpoint = '/api/auth/login';
+
+            if (isSignup) {
+                payload.fullName = document.getElementById('regName').value;
+                payload.walletAddress = document.getElementById('regWallet').value;
+                endpoint = '/api/auth/signup';
+            }
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alertBox.innerText = data.msg || 'An operational verification layout error occurred.';
+                    alertBox.classList.remove('hidden');
+                } else {
+                    if (isSignup) {
+                        alert('Registration successful! Please log in with your credentials.');
+                        switchView(false);
+                    } else {
+                        localStorage.setItem('hillstrade_user_token', data.sessionToken);
+                        window.location.href = '/dashboard.html';
+                    }
+                }
+            } catch (err) {
+                alertBox.innerText = 'Cannot interface with running server node.';
+                alertBox.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
