@@ -16,5 +16,14 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hillstrade/Hillstrade-Platform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hillstrade/Hillstrade-Platform/issues"
+  },
+  "homepage": "https://github.com/hillstrade/Hillstrade-Platform#readme"
 }
