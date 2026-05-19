@@ -4,11 +4,11 @@ const path = require('path');
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 
-// NETWORK FIX: Bound dynamically to support production routing
+// Bound dynamically to support production routing
 const PORT = process.env.PORT || 3000;
 
-// Local JSON Database Setup
-const DB_FILE = path.join(__dirname, 'database.json');
+// Cloud-safe temporary database path
+const DB_FILE = '/tmp/database.json';
 
 // Ensure database file exists upon server startup
 if (!fs.existsSync(DB_FILE)) {
@@ -17,7 +17,6 @@ if (!fs.existsSync(DB_FILE)) {
 
 // Global Middleware Systems
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Dynamic Assets & Public Folder Mapping
 app.use(express.static(path.join(__dirname, 'public')));
