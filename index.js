@@ -4,8 +4,7 @@ const path = require('path');
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-// 🛠️ NETWORK FIX: Bound dynamically to support production routing
+// NETWORK FIX: Bound dynamically to support production routing
 const PORT = process.env.PORT || 3000;
 
 // Local JSON Database Setup
